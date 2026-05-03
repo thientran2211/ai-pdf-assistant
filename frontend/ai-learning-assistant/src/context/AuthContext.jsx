@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import authService from "../services/authService";
 
 const AuthContext = createContext();
 
@@ -21,12 +22,17 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const userStr = localStorage.getItem('user');
+      const localToken = localStorage.getItem('token');
+      const localUser = localStorage.getItem('user');
 
-      if (token && userStr) {
-        const userData = JSON.parse(userStr);
-        setUser(userData);
+      const sessionToken = sessionStorage.getItem('token');
+      const sessionUser = sessionStorage.getItem('user');
+
+      if (localToken && localUser) {
+        setUser(JSON.parse(localUser));
+        setIsAuthenticated(true);
+      } else if (sessionToken && sessionUser) {
+        setUser(JSON.parse(sessionUser));
         setIsAuthenticated(true);
       }
     } catch (error) {
@@ -37,10 +43,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = (userData, token) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
+  const login = (userData, token, rememberMe = false) => {
+    if (rememberMe) {
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(userData));
 
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
+    } else {
+      sessionStorage.setItem('token', token);
+      sessionStorage.setItem('user', JSON.stringify(userData));
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+    
     setUser(userData);
     setIsAuthenticated(true);
   };
@@ -48,6 +65,8 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
 
     setUser(null);
     setIsAuthenticated(false);
@@ -56,7 +75,13 @@ export const AuthProvider = ({ children }) => {
 
   const updateUser = (updatedUserData) => {
     const newUserData = { ...user, ...updatedUserData };
-    localStorage.setItem('user', JSON.stringify(newUserData));
+
+    if (localStorage.getItem('token')) {
+      localStorage.setItem('user', JSON.stringify(newUserData));
+    } else {
+      sessionStorage.setItem('user', JSON.stringify(newUserData));
+    }
+    
     setUser(newUserData);
   };
 

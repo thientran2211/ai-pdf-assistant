@@ -53,12 +53,24 @@ const changePassword = async (passwords) => {
   }
 };
 
+const forgotPassword = async (email) => {
+  const response = await axiosInstance.post(API_PATHS.AUTH.FORGOT_PASSWORD, { email });
+  return response.data;
+};
+
+const resetPassword = async (token, password) => {
+  const response = await axiosInstance.post(`${API_PATHS.AUTH.RESET_PASSWORD}?token=${token}`, { password });
+  return response.data;
+};
+
 const authService = {
   login,
   register,
   getProfile,
   updateProfile,
   changePassword,
+  forgotPassword,
+  resetPassword
 };
 
 export default authService;

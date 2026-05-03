@@ -5,13 +5,22 @@ import { useAuth } from '../../context/AuthContext';
 import { LayoutDashboard, FileText, User, LogOut, BrainCircuit, BookOpen, X, Layout } from 'lucide-react';
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   const handleLogout = () => {
     logout();
     navigate("/login");
+  };
+
+  const handleLogoClick = () => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    } else {
+      navigate('/login');
+    }
+    if (isSidebarOpen) toggleSidebar();
   };
 
   const navLinks = [
@@ -34,7 +43,10 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
       >
         {/* Logo and Close button for mobile */}
         <div className="flex items-center justify-between h-16 px-5 border-b border-slate-200/60">
-          <div className="flex items-center gap-3">
+          <div
+            onClick={handleLogoClick}
+            className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+          >
             <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-linear-to-br from-emerald-400 to-teal-500 shadow-md shadow-emerald-500/200">
               <BrainCircuit className="text-white" size={20} strokeWidth={2.5} />
             </div>
@@ -89,6 +101,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
     </>
   );
-}
+};
 
 export default Sidebar;
