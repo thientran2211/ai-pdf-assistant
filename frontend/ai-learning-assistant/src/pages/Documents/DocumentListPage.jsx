@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Upload, Trash2, FileText, X } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { Plus, Upload, Trash2, FileText, X, Zap, Home } from 'lucide-react';
 
+import toast from 'react-hot-toast';
 import documentService from "../../services/documentService";
 import Spinner from '../../components/common/Spinner';
 import Button from '../../components/common/Button';
 import DocumentCard from '../../components/documents/DocumentCard';
+import LanguageToggle from '../../components/layout/LanguageToggle';
 
 const DocumentListPage = () => {
   const [documents, setDocuments] = useState([]);
@@ -24,14 +27,22 @@ const DocumentListPage = () => {
   const [selectedDoc, setSelectedDoc] = useState(null);
 
   const { t } = useTranslation();
+  const { isGuest, isAuthenticated, user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   const fetchDocuments = async () => {
+    if (authLoading) return;
+
     try {
-      const data = await documentService.getDocuments();
-      setDocuments(data);
+      const response = await documentService.getDocuments();
+      const docs = response?.documents || response?.data?.documents || response?.data || response || [];
+      const validDocs = Array.isArray(docs) ? docs.filter(doc => doc && doc._id) : [];  
+      setDocuments(validDocs);
     } catch (error) {
-      toast.error(t('documents.errorFetch'));
-      console.error(error);
+      console.error('Fetch documents error:', error);
+      if (!isGuest) {
+        toast.error(t('documents.errorFetch'));
+      }
     } finally {
       setLoading(false);
     }
@@ -39,7 +50,7 @@ const DocumentListPage = () => {
 
   useEffect(() => {
     fetchDocuments();
-  }, []);
+  }, [isGuest, isAuthenticated, authLoading]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -116,17 +127,20 @@ const DocumentListPage = () => {
               />
             </div>
             <h3 className="text-xl font-medium text-slate-900 tracking-tight mb-2">
-              {t('documents.noDocuments')}
+              {isGuest ? t('documents.guestEmptyTitle') : t('documents.noDocuments')}
             </h3>
             <p className="text-sm text-slate-500 mb-6">
-              {t('documents.emptyStateDesc')}
+              {isGuest 
+                ? t('documents.guestEmptyDesc') 
+                : t('documents.emptyStateDesc')
+              }
             </p>
             <button
               onClick={() => setIsUploadModalOpen(true)}
               className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 active:scale-[0.98]"
             >
               <Plus className="" strokeWidth={2.5} />
-              {t('documents.btnUpload')}
+              {isGuest ? t('documents.btnUploadGuest') : t('documents.btnUpload')}
             </button>
           </div>
         </div>
@@ -140,35 +154,86 @@ const DocumentListPage = () => {
             key={doc._id}
             document={doc}
             onDelete={handleDeleteRequest}
+            isGuest={isGuest}
           />
         ))}
       </div>
     );
   };
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       {/* Subtle background pattern */}
       <div className="absolute inset-0 bg-[radiant-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px] opacity-30 pointer-events-none" />
 
-      <div className="relative max-w-7xl mx-auto">
+      <div className="relative page-container">
+
+        <nav className="flex items-center gap-2 text-sm text-slate-600 mb-8 mt-4">
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors decoration-2 underline-offset-4"
+          >
+            <Home className="w-4 h-4" />
+            {t('common.home')}
+          </Link>
+          <span className="text-slate-400">/</span>
+          <span className="text-slate-700 font-medium">
+            {isGuest ? t('documents.guestTitle') : t('documents.title')}
+          </span>
+        </nav>
+
         {/* Header */}
-        <div className="flex items-center justify-between mb-10">
-          <div>
-            <h1 className="text-2xl font-medium text-slate-900 tracking-tight mb-2">
-              {t('documents.title')}
-            </h1>
-            <p className="text-slate-500 text-sm">
-              {t('documents.subtitle')}
-            </p>
+        <div className="page-header">
+          <div className="flex items-start justify-between gap-4 w-full">
+            <div>
+              <h1 className="text-2xl font-medium text-slate-900 tracking-tight mb-2">
+                {isGuest ? t('documents.guestTitle') : t('documents.title')}
+              </h1>
+              <p className="text-slate-500 text-sm">
+                {isGuest ? t('documents.guestSubtitle') : t('documents.subtitle')}
+              </p>
+            </div>
+            <div className="flex items-center gap-3 flex-shrink-0">
+                {documents.length > 0 && (
+                  <Button onClick={() => setIsUploadModalOpen(true)}>
+                    <Plus className="w-4 h-4" strokeWidth={2.5} />
+                    {isGuest ? t('documents.btnUploadGuest') : t('documents.btnUpload')}
+                  </Button>
+                )}
+            </div>
           </div>
-          {documents.length > 0 && (
-            <Button onClick={() => setIsUploadModalOpen(true)}>
-              <Plus className="w-4 h-4" strokeWidth={2.5} />
-              {t('documents.btnUpload')}
-            </Button>
-          )}
         </div>
+
+        {/* Guest warning banner */}
+        {isGuest && documents.length > 0 && (
+          <div className="section-spacing p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+            <div className="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
+              <Zap className="w-3 h-3 text-amber-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-amber-900 mb-1">
+                {t('documents.guestWarningTitle')}
+              </p>
+              <p className="text-xs text-amber-800 mb-2">
+                {t('documents.guestWarningDesc')}
+              </p>
+              <a
+                href="/register"
+                className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 underline"
+              >
+                {t('documents.guestWarningRegister')}
+              </a>
+            </div>
+          </div>
+        )}
 
         {renderContent()}
       </div>

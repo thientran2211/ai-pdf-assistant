@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Send, MessageSquare, Sparkles } from 'lucide-react';
-import { useParams } from 'react-router-dom';
 import aiService from '../../services/aiService';
-import { useAuth } from '../../context/AuthContext';
+import toast from 'react-hot-toast';
 import Spinner from '../common/Spinner';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 
-const ChatInterface = () => {
-  const { id: documentId } = useParams();
-  const { user } = useAuth();
+const ChatInterface = ({ documentId, isGuest = false }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [history, setHistory] = useState([]);
-  const [message, SetMessage] = useState('');
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const messagesEndRef = useRef(null);
@@ -22,19 +22,29 @@ const ChatInterface = () => {
   };
 
   useEffect(() => {
+    if (isGuest) {
+      setInitialLoading(false);
+      return;
+    }
+
     const fetchChatHistory = async () => {
       try {
         setInitialLoading(true);
         const response = await aiService.getChatHistory(documentId);
-        setHistory(response.data);
+        const messages = response?.data?.messages || response?.data || [];
+        setHistory(messages);
       } catch (error) {
         console.error('Failed to fetch chat history:', error);
+        if (!isGuest) {
+          toast.error(t('chat.historyError') || 'Failed to load chat history');
+        }
       } finally {
         setInitialLoading(false);
       }
     };
+
     fetchChatHistory();
-  }, [documentId]);
+  }, [documentId, isGuest, t]);
 
   useEffect(() => {
     scrollToBottom();
@@ -42,28 +52,38 @@ const ChatInterface = () => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!message.trim() || loading) return;
 
     const userMessage = { role: 'user', content: message, timestamp: new Date() };
     setHistory(prev => [...prev, userMessage]);
-    SetMessage('');
+    setMessage('');
     setLoading(true);
 
     try {
       const response = await aiService.chat(documentId, userMessage.content);
+      
+      const responseData = response?.data || response;
+      const answer = responseData?.answer || responseData?.response || responseData?.data?.answer;
+
       const assistantMessage = {
         role: 'assistant',
-        content: response.data.answer,
+        content: answer || t('chat.noResponse'),
         timestamp: new Date(),
-        relevantChunks: response.data.relevantChunks
+        relevantChunks: response.data.relevantChunks || [],
       };
+
       setHistory(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Chat error:', error);
+
+      const errorMsg = error?.response?.data?.error || error?.message || t('chat.error');
+      toast.error(errorMsg);
+
       const errorMessage = {
         role: 'assistant',
-        content: t('chat.error'),
-        timestamp: new Date()
+        content: t('chat.errorMessage') || 'Sorry, I encountered an error. Please try again.',
+        timestamp: new Date(),
+        isError: true
       };
       setHistory(prev => [...prev, errorMessage]);
     } finally {
@@ -151,7 +171,7 @@ const ChatInterface = () => {
           <input
             type="text"
             value={message}
-            onChange={(e) => SetMessage(e.target.value)}
+            onChange={(e) => setMessage(e.target.value)}
             placeholder={t('chat.placeholder')}
             className="flex-1 h-12 px-4 border-2 border-slate-200 rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:shadow-lg focus:shadow-emerald-500/10"
             disabled={loading}
@@ -164,9 +184,15 @@ const ChatInterface = () => {
             <Send className="w-5 h-5" strokeWidth={2} />
           </button>
         </form>
+        {isGuest && (
+          <p className="text-[10px] text-amber-600 mt-2 flex items-center gap-1">
+            <span>⚡</span>
+            {t('chat.guestNotice') || 'Guest mode: Chat history won\'t be saved'}
+          </p>
+        )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default ChatInterface;

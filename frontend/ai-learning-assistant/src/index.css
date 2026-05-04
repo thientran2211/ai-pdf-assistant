@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Urbanish", sans-serif;
+  --font-display: "Urbanist", sans-serif;
   --breakpoint-3xl: 1920px;
   --color-primary: #FF9324;
 }
@@ -10,9 +10,105 @@
 @layer base {
   html {
     font-family: var(--font-display);
+    scroll-behavior: smooth;
   }
 
   body {
+    @apply bg-slate-50 text-slate-900 antialiased min-h-screen;
     background-color: #fcfbfc;
   }
+
+  #root {
+    @apply min-h-screen flex flex-col;
+  }
+}
+
+@layer components {
+  .page-container {
+    @apply max-w-7xl mx-auto px-6 py-8 w-full;
+  }
+
+  .page-header {
+    @apply mb-10 mt-4 flex items-start justify-between gap-4 flex-wrap;
+  }
+
+  .section-spacing {
+    @apply mb-8;
+  }
+
+  .app-header {
+    @apply sticky top-0 z-40 pt-4 pb-6 px-6 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 w-full;
+  }
+
+  .app-main {
+    @apply flex-1 px-6 py-8 w-full;
+  }
+
+  .card-spacing {
+    @apply p-6;
+  }
+
+  .button-group {
+    @apply flex items-center gap-3 flex-wrap;
+  }
+
+  @media (max-width: 768px) {
+    .page-container,
+    .app-main {
+      @apply px-4 py-6;
+    }
+    
+    .app-header {
+      @apply pt-3 pb-4 px-4;
+    }
+    
+    .page-header {
+      @apply mb-8 mt-3 flex-col items-start;
+    }
+    
+    .card-spacing {
+      @apply p-4;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .page-container,
+    .app-main {
+      @apply px-3 py-4;
+    }
+    
+    .app-header {
+      @apply pt-2 pb-3 px-3;
+    }
+    
+    .page-header {
+      @apply mb-6 mt-2;
+    }
+    
+    .button-group {
+      @apply gap-2;
+    }
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+}
+
+::-webkit-scrollbar {
+  @apply w-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full hover:bg-slate-400 transition-colors;
 }

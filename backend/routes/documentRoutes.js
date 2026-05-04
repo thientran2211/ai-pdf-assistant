@@ -1,4 +1,5 @@
 import express from 'express';
+import { optionalAuth } from '../middleware/optionalAuth.js';
 import {
   uploadDocument,
   getDocuments,
@@ -11,11 +12,12 @@ import upload from '../config/multer.js';
 const router = express.Router();
 
 // All routes are protected
-router.use(protect);
+// router.use(protect);
 
-router.post('/upload', upload.single('file'), uploadDocument);
-router.get('/', getDocuments);
-router.get('/:id', getDocument);
+router.post('/upload', optionalAuth, upload.single('file'), uploadDocument);
+router.get('/', optionalAuth, getDocuments);
+router.get('/:id', optionalAuth, getDocument);
+
 router.delete('/:id', deleteDocument);
 
 export default router;

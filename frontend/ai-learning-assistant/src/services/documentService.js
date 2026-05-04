@@ -4,7 +4,7 @@ import { API_PATHS } from "../utils/apiPaths";
 const getDocuments = async () => {
   try {
     const response = await axiosInstance.get(API_PATHS.DOCUMENTS.GET_DOCUMENTS);
-    return response.data?.data;
+    return response.data?.documents || response.data?.data || [];
   } catch (error) {
     throw error.response?.data || { message: 'Failed to fetch documents' };
   }
@@ -35,7 +35,7 @@ const deleteDocument = async (id) => {
 const getDocumentById = async (id) => {
   try {
     const response = await axiosInstance.get(API_PATHS.DOCUMENTS.GET_DOCUMENT_BY_ID(id));
-    return response.data;
+    return response.data?.document || response.data?.data || response.data;
   } catch (error) {
     throw error.response?.data || { message: 'Failed to fetch document details' };
   }

@@ -94,13 +94,13 @@ export const executeWithFallback = async (taskType, functionName, ...args) => {
 
         // Chỉ fallback nếu là lỗi tạm thời
         if (isRetryableError(primaryError)) {
-            console.log(`🔄 [Orchestrator] Falling back to ${config.fallback.toUpperCase()}...`);
+            console.log(`[Orchestrator] Falling back to ${config.fallback.toUpperCase()}...`);
             try {
                 const result = await fallbackService[functionName](...args);
-                console.log(`✅ [Orchestrator] Fallback to ${config.fallback.toUpperCase()} succeeded`);
+                console.log(`[Orchestrator] Fallback to ${config.fallback.toUpperCase()} succeeded`);
                 return result;
             } catch (fallbackError) {
-                console.error(`❌ [Orchestrator] Both ${config.primary} and ${config.fallback} failed for ${taskType}`);
+                console.error(`[Orchestrator] Both ${config.primary} and ${config.fallback} failed for ${taskType}`);
                 throw new Error(`AI service temporarily unavailable. Please try again later.`);
             }
         }

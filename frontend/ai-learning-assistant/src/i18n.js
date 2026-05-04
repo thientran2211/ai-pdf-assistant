@@ -18,15 +18,20 @@ i18n
         translation: vi
       }
     },
-    fallbackLng: 'en',  // Default language
+    fallbackLng: 'en',
     supportedLngs: ['en', 'vi'],
+
     interpolation: {
-      escapeValue: false  // React already escape values
+      escapeValue: false
     },
+
     detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage']
-    }
+      order: ['localStorage', 'navigator', 'htmlTag'],
+      caches: ['localStorage'],
+      lookupLocalStorage: 'preferredLanguage'
+    },
+
+    debug: process.env.NODE_ENV === 'development'
   });
 
 export default i18n;

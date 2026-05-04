@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { isValidEmail, getEmailError } from '../../utils/validation';
 import authService from '../../services/authService';
-import { BrainCircuit, Mail, Lock, ArrowRight, User, Eye, EyeOff } from 'lucide-react';
+import { BrainCircuit, Mail, Home, Lock, ArrowRight, User, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const RegisterPage = () => {
@@ -57,14 +57,27 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-50 flex flex-col">
 
-      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px] opacity-30" />
+      <div className="w-full px-6 py-4 md:px-8">
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600 font-medium transition-colors decoration-2 underline-offset-4"
+        >
+          <Home className="w-4 h-4" />
+          {t('common.backToHome')}
+        </Link>
+      </div>
 
-      <div className="relative w-full max-w-md px-6">
-        <div className="bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-3xl shadow-xl shadow-slate-200/50 p-10">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px] opacity-30 pointer-events-none" />
+
+      {/* MAIN CONTENT */}
+      <div className="flex-1 flex items-center justify-center px-4 py-8 relative z-10">
+        <div className="w-full max-w-md bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-3xl shadow-xl shadow-slate-200/50 p-8 md:p-10">
+          
           {/* Header */}
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-linear-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/25 mb-6">
               <BrainCircuit className="w-7 h-7 text-white" strokeWidth={2} />
             </div>
@@ -78,7 +91,7 @@ const RegisterPage = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-
+            
             {/* Username field */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wide">
@@ -148,7 +161,8 @@ const RegisterPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   onFocus={() => setFocusedField("password")}
                   onBlur={() => setFocusedField(null)}
-                  className="w-full h-12 pl-12 pr-4 border-2 border-slate-200 rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:shadow-lg focus:shadow-emerald-500/10"
+                  // 🔧 FIX: Thay pr-4 bằng pr-12 để tránh text bị đè bởi icon mắt
+                  className="w-full h-12 pl-12 pr-12 border-2 border-slate-200 rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:shadow-lg focus:shadow-emerald-500/10"
                   placeholder={t('auth.placeholderPassword')}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !loading) handleSubmit(e); }}
                 />
@@ -164,7 +178,7 @@ const RegisterPage = () => {
                   ) : (
                     <Eye className="w-5 h-5" strokeWidth={2} />
                   )}
-              </button> 
+                </button>             
               </div>
             </div>
 
@@ -207,18 +221,18 @@ const RegisterPage = () => {
           <div className="mt-8 pt-6 border-t border-slate-200/60">
             <p className="text-center text-sm text-slate-600">
               {t('auth.haveAccount')}{" "}
-              <Link to='/login' className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors duration-200">
+              <Link to='/login' className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors duration-200 hover:underline">
                 {t('auth.signIn')}
               </Link>
             </p>
           </div>
         </div>
-
-        {/* Subtle footer text */}
-        <p className="text-center text-xs text-slate-400 mt-6">
-          {t('auth.footerPolicy')}
-        </p>
       </div>
+      
+      {/* Subtle footer text */}
+      <p className="text-center text-xs text-slate-400 pb-6">
+        {t('auth.footerPolicy')}
+      </p>
     </div>
   );
 };

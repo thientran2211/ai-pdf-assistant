@@ -10,7 +10,9 @@
     "close": "Đóng",
     "submit": "Gửi",
     "back": "Quay lại",
-    "upload": "Tải lên"
+    "upload": "Tải lên",
+    "home": "Trang chủ",
+    "backToHome": "Về trang chủ"
   },
   "header": {
     "notifications": "Thông báo",
@@ -26,12 +28,16 @@
     "quizzes": "Bài kiểm tra"
   },
   "chat": {
-    "placeholder": "Hỏi tiếp về tài liệu...",
     "startTitle": "Bắt đầu trò chuyện",
     "startDesc": "Hỏi tôi bất cứ điều gì về tài liệu!",
     "loading": "Đang tải lịch sử chat...",
-    "error": "Xin lỗi, đã xảy ra lỗi. Vui lòng thử lại.",
-    "thinking": "Đang suy nghĩ..."
+    "thinking": "Đang suy nghĩ...",
+    "guestPlaceholder": "Hỏi về tài liệu này... (Guest mode)",
+    "placeholder": "Hỏi về tài liệu này...",
+    "error": "Không thể nhận phản hồi. Vui lòng thử lại.",
+    "errorMessage": "Rất tiếc, tôi gặp lỗi. Vui lòng thử lại.",
+    "noResponse": "Không có phản hồi từ AI.",
+    "guestNotice": "Chế độ khách: Lịch sử chat sẽ không được lưu"
   },
   "aiActions": {
     "title": "Trợ lý AI",
@@ -110,7 +116,27 @@
     "uploading": "Đang tải lên...",
     "deleting": "Đang xóa...",
     "modalDeleteTitle": "Xác nhận xóa",
-    "modalDeleteDesc": "Bạn có chắc chắn muốn xóa tài liệu: \"{{title}}\"? Hành động này không thể hoàn tác."
+    "modalDeleteDesc": "Bạn có chắc chắn muốn xóa tài liệu: \"{{title}}\"? Hành động này không thể hoàn tác.",
+    "guestTitle": "Tài liệu của tôi",
+    "guestSubtitle": "Upload và quản lý tài liệu PDF của bạn",
+    "guestEmptyTitle": "Chưa có tài liệu",
+    "guestEmptyDesc": "Upload PDF đầu tiên của bạn để bắt đầu học. Tài liệu sẽ được lưu trong 24 giờ.",
+    "btnUploadGuest": "Upload Tài liệu",
+    "guestWarningTitle": "Chế độ Khách - Tài liệu sẽ hết hạn sau 24 giờ",
+    "guestWarningDesc": "Tài liệu bạn tải lên sẽ tự động xóa sau 24 giờ. Đăng ký để lưu vĩnh viễn.",
+    "guestWarningRegister": "Tạo tài khoản miễn phí →",
+    "guestBadge": "Guest",
+    "guestViewHint": "Bạn đang xem với tư cách khách. Đăng ký để lưu tài liệu vĩnh viễn.",
+    "guestExpiryTitle": "Tài liệu này sẽ hết hạn",
+    "guestExpiryDesc": "Tài liệu sẽ tự động xóa vào {{expiresAt}}. Đăng ký để lưu vĩnh viễn.",
+    "guestExpiryRegister": "Tạo tài khoản miễn phí →",
+    "flashcardsLockedTitle": "Flashcards - Tính năng cao cấp",
+    "flashcardsLockedDesc": "Tạo flashcards tự động từ tài liệu để ôn tập hiệu quả.",
+    "quizzesLockedTitle": "Quizzes - Tính năng cao cấp",
+    "quizzesLockedDesc": "Tạo bài kiểm tra tự động và theo dõi tiến độ học tập.",
+    "unlockFeature": "Mở khóa tính năng",
+    "flashcardsLocked": "Đăng ký để tạo flashcards",
+    "quizzesLocked": "Đăng ký để tạo quizzes"
   },
   "flashcards": {
     "title": "Flashcards",
@@ -269,5 +295,50 @@
     "errorChangePassword": "Không thể đổi mật khẩu.",
     "passwordMismatch": "Mật khẩu mới không khớp.",
     "passwordLength": "Mật khẩu phải có ít nhất 6 ký tự."
+  },
+  "landing": {
+    "freeToUse": "Miễn phí - Không cần đăng ký",
+    "heroTitle": "Làm chủ PDF tiếng Anh với AI",
+    "heroSubtitle": "Upload PDF, chat với AI, và cải thiện khả năng đọc hiểu. Dùng thử miễn phí - không cần đăng ký!",
+    "startUploading": "Bắt đầu Upload",
+    "createAccount": "Tạo tài khoản miễn phí",
+    "featureUploadTitle": "Upload PDF",
+    "featureUploadDesc": "Upload tài liệu PDF và để AI tự động trích xuất và xử lý nội dung.",
+    "featureChatTitle": "Chat với AI",
+    "featureChatDesc": "Đặt câu hỏi về tài liệu và nhận câu trả lời chính xác ngay lập tức.",
+    "featureAITitle": "AI Actions",
+    "featureAIDesc": "Tạo tóm tắt và giải thích nội dung tự động với sự hỗ trợ của AI.",
+    "premiumTitle": "Mở khóa tính năng cao cấp",
+    "premiumSubtitle": "Đăng ký miễn phí để truy cập flashcards, quizzes và lưu tài liệu vĩnh viễn.",
+    "featureFlashcardsTitle": "Flashcards tự động",
+    "featureFlashcardsDesc": "AI tự động tạo flashcards từ nội dung tài liệu để ôn tập hiệu quả.",
+    "featureQuizzesTitle": "Quizzes tương tác",
+    "featureQuizzesDesc": "Tạo bài kiểm tra tự động và theo dõi tiến độ học tập của bạn.",
+    "unlockPremium": "Mở khóa tính năng cao cấp",
+    "whyChooseTitle": "Tại sao chọn Awesome PDF?",
+    "whyChooseSubtitle": "Công cụ học tập AI mạnh mẽ, dễ sử dụng và hoàn toàn miễn phí",
+    "reason1Title": "Nhanh chóng",
+    "reason1Desc": "Xử lý tài liệu và tạo nội dung học tập trong vài giây.",
+    "reason2Title": "Chính xác",
+    "reason2Desc": "AI được đào tạo để cung cấp thông tin chính xác và đáng tin cậy.",
+    "reason3Title": "Thông minh",
+    "reason3Desc": "Học và thích ứng với phong cách học tập của bạn."
+  },
+  "upgrade": {
+    "flashcardsTitle": "Mở khóa Flashcards",
+    "flashcardsDesc": "AI tự động tạo flashcards từ nội dung tài liệu để bạn ôn tập hiệu quả.",
+    "quizzesTitle": "Mở khóa Quizzes",
+    "quizzesDesc": "Tạo bài kiểm tra tự động và theo dõi tiến độ học tập của bạn.",
+    "defaultTitle": "Mở khóa tính năng cao cấp",
+    "defaultDesc": "Đăng ký miễn phí để truy cập đầy đủ các tính năng của Awesome PDF.",
+    "benefit1": "Lưu tài liệu vĩnh viễn, không giới hạn thời gian",
+    "benefit2": "Tạo flashcards tự động với AI",
+    "benefit3": "Ôn tập thông minh với spaced repetition",
+    "benefit4": "Tạo quizzes tự động từ nội dung tài liệu",
+    "benefit5": "Theo dõi tiến độ và điểm số chi tiết",
+    "benefit6": "Thách thức bản thân với các cấp độ khó khác nhau",
+    "benefit7": "Hỗ trợ ưu tiên và cập nhật tính năng mới",
+    "registerNow": "Đăng ký miễn phí",
+    "maybeLater": "Có lẽ để sau"
   }
 }

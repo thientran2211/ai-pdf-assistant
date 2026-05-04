@@ -4,7 +4,19 @@ const documentSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false,
+    default: null
+  },
+  guestSessionId: {
+    type: String,
+    default: null
+  },
+
+  expiresAt: {
+    type: Date,
+    default: function() {
+      return this.userId ? null: new Date(Date.now() + 24 * 60 * 60 * 1000);
+    }
   },
   title: {
     type: String,
@@ -55,7 +67,8 @@ const documentSchema = new mongoose.Schema({
     default: 'processing'
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  expireAfterSeconds: 86400
 });
 
 // Index for faster queries

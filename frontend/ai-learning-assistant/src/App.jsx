@@ -15,6 +15,7 @@ import FlashcardPage from './pages/Flashcards/FlashcardPage';
 import QuizTakePage from './pages/Quizzes/QuizTakePage';
 import QuizResultPage from './pages/Quizzes/QuizResultPage';
 import ProfilePage from './pages/Profile/ProfilePage';
+import LandingPage from './pages/LandingPage';
 
 const App = () => {
   const { isAuthenticated, loading } = useAuth()
@@ -22,7 +23,7 @@ const App = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p>Loading...</p>
+        <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -32,17 +33,18 @@ const App = () => {
       <Routes>
         <Route
           path="/"
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} />
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+        
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/documents" element={<DocumentListPage />} />
+        <Route path="documents/:id" element={<DocumentDetailPage />} />
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/documents" element={<DocumentListPage />} />
-          <Route path="documents/:id" element={<DocumentDetailPage />} />
           <Route path="/flashcards" element={<FlashcardsListPage />} />
           <Route path="/documents/:id/flashcards" element={<FlashcardPage />} />
           <Route path="quizzes/:quizId" element={<QuizTakePage />} />

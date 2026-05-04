@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { Bell, User, Menu } from 'lucide-react';
+
 import LanguageToggle from './LanguageToggle';
 import progressService from '../../services/progressService';
 import moment from 'moment';
@@ -72,8 +73,9 @@ const Header = ({ toggleSidebar }) => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full h-16 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
-      <div className="flex items-center justify-between h-full px-6">
+    <header className="app-header">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-full">
+
         {/* Mobile menu button */}
         <button
           onClick={toggleSidebar}
@@ -85,7 +87,8 @@ const Header = ({ toggleSidebar }) => {
         
         <div className="hidden md:block"></div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
+
           <LanguageToggle />
 
           <div className="relative" ref={notifRef}>
@@ -100,7 +103,7 @@ const Header = ({ toggleSidebar }) => {
 
             {/* Notification Dropdown */}
             {showNotif && (
-              <div className="absolute right-0 top-12 w-80 md:w-96 bg-white rounded-xl shadow-lg border border-slate-200/60 p-4 z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="absolute right-0 top-12 w-80 md:w-96 bg-white rounded-xl shadow-lg border border-slate-200/60 p-4 z-50 animate-in fade-in slide-in-from-top-2 language-dropdown">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-semibold text-slate-900">{t('dashboard.recentActivity')}</h4>
                   <button 
@@ -151,6 +154,9 @@ const Header = ({ toggleSidebar }) => {
           <div
             onClick={() => navigate('/profile')}
             className="flex items-center gap-3 pl-3 border-l border-slate-200/60 cursor-pointer hover:bg-slate-50 rounded-xl px-3 py-1.5 transition-all duration-200 group"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && navigate('/profile')}
           >
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 group-hover:shadow-lg group-hover:shadow-emerald-500/30 transition-all duration-200">
               <User size={18} strokeWidth={2.5} />

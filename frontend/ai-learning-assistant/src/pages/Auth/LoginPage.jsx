@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { isValidEmail, getEmailError } from '../../utils/validation';
 import { useAuth } from '../../context/AuthContext';
 import authService from '../../services/authService';
-import { BrainCircuit, Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { BrainCircuit, Mail, Home, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
@@ -69,14 +69,27 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-50 flex flex-col">
+      
+      <div className="w-full px-6 py-4 md:px-8">
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600 font-medium transition-colors decoration-2 underline-offset-4"
+        >
+          <Home className="w-4 h-4" />
+          {t('common.backToHome')}
+        </Link>
+      </div>
 
-      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px] opacity-30" />
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px] opacity-30 pointer-events-none" />
 
-      <div className="relative w-full max-w-md px-6">
-        <div className="bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-3xl shadow-xl shadow-slate-200/50 p-10">
+      {/* MAIN CONTENT */}
+      <div className="flex-1 flex items-center justify-center px-4 py-8 relative z-10">
+        <div className="w-full max-w-md bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-3xl shadow-xl shadow-slate-200/50 p-8 md:p-10">
+          
           {/* Header */}
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-linear-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/25 mb-6">
               <BrainCircuit className="w-7 h-7 text-white" strokeWidth={2} />
             </div>
@@ -112,17 +125,12 @@ const LoginPage = () => {
                       : 'border-slate-200 focus:border-emerald-500 focus:shadow-emerald-500/10'
                   }`}
                   placeholder={t('auth.placeholderEmail')}
-                  aria-invalid={!!emailError}
-                  aria-describedby={emailError ? 'email-error' : undefined}
                   autoFocus
                 />
               </div>
               {emailError && (
-                <p id="email-error" className="text-xs text-red-500 font-medium mt-1 ml-1" role="alert">
-                  {emailError === 'invalid_format' 
-                    ? t('auth.emailInvalid')
-                    : emailError
-                  }
+                <p className="text-xs text-red-500 font-medium mt-1 ml-1">
+                  {emailError === 'invalid_format' ? t('auth.emailInvalid') : emailError}
                 </p>
               )}
             </div>
@@ -142,7 +150,7 @@ const LoginPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   onFocus={() => setFocusedField('password')}
                   onBlur={() => setFocusedField(null)}
-                  className="w-full h-12 pl-12 pr-4 border-2 border-slate-200 rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:shadow-lg focus:shadow-emerald-500/10"
+                  className="w-full h-12 pl-12 pr-12 border-2 border-slate-200 rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:shadow-lg focus:shadow-emerald-500/10"
                   placeholder={t('auth.placeholderPassword')}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !loading) handleSubmit(e); }}
                 />
@@ -151,24 +159,17 @@ const LoginPage = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors duration-200"
                   tabIndex={-1}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" strokeWidth={2} />
-                  ) : (
-                    <Eye className="w-5 h-5" strokeWidth={2} />
-                  )}
+                  {showPassword ? <EyeOff className="w-5 h-5" strokeWidth={2} /> : <Eye className="w-5 h-5" strokeWidth={2} />}
                 </button>             
               </div>
             </div>
 
-            {/* Remember Me checkbox */}
+            {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-3 cursor-pointer group">    
                 <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
-                  rememberMe 
-                    ? 'bg-emerald-500 border-emerald-500' 
-                    : 'bg-white border-slate-300 group-hover:border-emerald-400'
+                  rememberMe ? 'bg-emerald-500 border-emerald-500' : 'bg-white border-slate-300 group-hover:border-emerald-400'
                 }`}>
                   {rememberMe && (
                     <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -176,12 +177,7 @@ const LoginPage = () => {
                     </svg>
                   )}
                 </div>
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="sr-only" 
-                />
+                <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="sr-only" />
                 <span className="text-sm text-slate-600 font-medium group-hover:text-slate-900 transition-colors">
                   {t('auth.rememberMe')}
                 </span>
@@ -214,7 +210,7 @@ const LoginPage = () => {
                 ) : (
                   <>
                     {t('auth.signIn')}
-                    <ArrowRight className="w-4 h-4 group-hover: translate-x-1 transition-transform duration-200" strokeWidth={2.5} />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" strokeWidth={2.5} />
                   </>
                 )}
               </span>
@@ -227,17 +223,12 @@ const LoginPage = () => {
           <div className="mt-8 pt-6 border-t border-slate-200/60">
             <p className="text-center text-sm text-slate-600">
               {t('auth.noAccount')}{' '}
-              <Link to='/register' className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors duration-200">
+              <Link to='/register' className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors duration-200 hover:underline">
                 {t('auth.signUp')}
               </Link>
             </p>
           </div>
         </div>
-
-        {/* Subtle footer text */}
-        <p className="text-center text-xs text-slate-400 mt-6">
-          {t('auth.footerPolicy')}
-        </p>
       </div>
     </div>
   );

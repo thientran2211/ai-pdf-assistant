@@ -2,6 +2,7 @@ import Document from '../models/Document.js';
 import Flashcard from '../models/Flashcard.js';
 import Quiz from '../models/Quiz.js';
 import { extractTextFromPDF } from '../utils/pdfParser.js';
+import { optionalAuth } from '../middleware/optionalAuth.js';
 import { chunkText } from '../utils/textChunker.js';
 import fs from 'fs/promises';
 import mongoose from 'mongoose';
@@ -11,6 +12,17 @@ import mongoose from 'mongoose';
 // @access  Private
 export const uploadDocument = async (req, res, next) => {
   try {
+    const userId = req.user?._id || null;
+
+    const guestSessionId = !req.user ? req.headers['x-guest-session'] : null;
+
+    if (!userId && !guestSessionId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Guest session ID is required'
+      });
+    }
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -36,7 +48,8 @@ export const uploadDocument = async (req, res, next) => {
 
     // Create document record
     const document = await Document.create({
-      userId: req.user._id,
+      userId: userId,
+      guestSessionId,
       title,
       fileName: req.file.originalname,
       filePath: fileUrl, // store the URL instead of the local path
@@ -93,10 +106,33 @@ const processPDF = async (documentId, filePath) => {
 // @access  Private
 export const getDocuments = async (req, res, next) => {
   try {
+    let matchStage;
+
+    if (!req.user) {
+      const guestSessionId = req.headers['x-guest-session'];
+      if (!guestSessionId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Guest session ID required',
+          statusCode: 400
+        });
+      }
+      matchStage = { 
+        $match: { 
+          guestSessionId: guestSessionId,
+          userId: null
+        } 
+      };
+    } else {
+      matchStage = { 
+        $match: { 
+          userId: new mongoose.Types.ObjectId(req.user._id) 
+        } 
+      };
+    }
+
     const documents = await Document.aggregate([
-      {
-        $match: { userId: new mongoose.Types.ObjectId(req.user._id) }
-      },
+      matchStage,
       {
         $lookup: {
           from: 'flashcards',
@@ -131,13 +167,16 @@ export const getDocuments = async (req, res, next) => {
         $sort: { uploadDate: -1 }
       }
     ]);
+    
+    const validDocuments = documents.filter(doc => doc && doc._id);
 
     res.status(200).json({
       success: true,
-      count: documents.length,
-      data: documents
+      count: validDocuments.length,
+      documents: validDocuments
     });
   } catch (error) {
+    console.error('Get documents error:', error);
     next(error);
   }
 };
@@ -147,10 +186,26 @@ export const getDocuments = async (req, res, next) => {
 // @access  Private
 export const getDocument = async (req, res, next) => {
   try {
-    const document = await Document.findOne({
-      _id: req.params.id,
-      userId: req.user._id
-    });
+    const { id } = req.params;
+
+    const query = { _id: id};
+
+    if (!req.user) {
+      const guestSessionId = req.headers['x-guest-session'];
+      if (!guestSessionId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Guest session Id required',
+          statusCode: 400
+        });
+      }
+      query.guestSessionId = guestSessionId;
+      query.userId = null;
+    } else {
+      query.userId = req.user._id;
+    }
+
+    const document = await Document.findOne(query);
 
     if (!document) {
       return res.status(404).json({
@@ -160,9 +215,23 @@ export const getDocument = async (req, res, next) => {
       });
     }
 
+    let flashcardCount = 0;
+    let quizCount = 0;
+
+    if (req.user) {
+      flashcardCount = await Flashcard.countDocuments({
+        documentId: document._id,
+        userId: req.user._id
+      });
+      quizCount = await Quiz.countDocuments({
+        documentId: document._id,
+        userId: req.user._id
+      });
+    }
+
     // Get counts of associated flashcards and quizzes
-    const flashcardCount = await Flashcard.countDocuments({ documentId: document._id, userId: req.user._id });
-    const quizCount = await Quiz.countDocuments({ documentId: document._id, userId: req.user._id });
+    // const flashcardCount = await Flashcard.countDocuments({ documentId: document._id, userId: req.user._id });
+    // const quizCount = await Quiz.countDocuments({ documentId: document._id, userId: req.user._id });
 
     // Update last accessed
     document.lastAccessed = Date.now();

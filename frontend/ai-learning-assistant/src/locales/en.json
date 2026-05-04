@@ -12,7 +12,9 @@
     "back": "Back",
     "upload": "Upload",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "home": "Home",
+    "backToHome": "Back to Home"
   },
   "header": {
     "notifications": "Notifications",
@@ -28,12 +30,16 @@
     "quizzes": "Quizzes"
   },
   "chat": {
-    "placeholder": "Ask a follow-up question...",
     "startTitle": "Start a conversation",
     "startDesc": "Ask me anything about the document!",
     "loading": "Loading chat history...",
-    "error": "Sorry, I encountered an error. Please try again.",
-    "thinking": "Thinking..."
+    "thinking": "Thinking...",
+    "guestPlaceholder": "Ask about this document... (Guest mode)",
+    "placeholder": "Ask about this document...",
+    "error": "Failed to get response. Please try again.",
+    "errorMessage": "Sorry, I encountered an error. Please try again.",
+    "noResponse": "No response from AI.",
+    "guestNotice": "Guest mode: Chat history won't be saved"
   },
   "aiActions": {
     "title": "AI Assistant",
@@ -114,7 +120,20 @@
     "uploading": "Uploading...",
     "deleting": "Deleting...",
     "modalDeleteTitle": "Confirm Deletion",
-    "modalDeleteDesc": "Are you sure you want to delete the document: \"{{title}}\"? This action cannot be undone."
+    "modalDeleteDesc": "Are you sure you want to delete the document: \"{{title}}\"? This action cannot be undone.",
+    "guestTitle": "My Documents",
+    "guestSubtitle": "Upload and manage your PDF documents",
+    "guestEmptyTitle": "No Documents Yet",
+    "guestEmptyDesc": "Upload your first PDF to start learning. Documents are stored for 24 hours.",
+    "btnUploadGuest": "Upload Document",
+    "guestWarningTitle": "Guest Mode - Documents expire in 24 hours",
+    "guestWarningDesc": "Your uploaded documents will be automatically deleted after 24 hours. Register to save them permanently.",
+    "guestWarningRegister": "Create free account →",
+    "flashcardsLocked": "Register to create flashcards",
+    "guestExpiryDesc": "This document will be automatically deleted on {{expiresAt}}. Register to save it permanently.",
+    "guestExpiryTitle": "⚡ Document expires soon",
+    "guestExpiryRegister": "Create free account →",
+    "guestViewHint": "You are viewing as a guest. Register to save documents permanently."
   },
   "flashcards": {
     "title": "Flashcards",
@@ -273,5 +292,33 @@
     "errorChangePassword": "Failed to change password.",
     "passwordMismatch": "New passwords do not match.",
     "passwordLength": "Password must be at least 6 characters long."
+  },
+  "landing": {
+    "freeToUse": "Free - No account required",
+    "heroTitle": "AI-Powered English Reading Assistant",
+    "heroSubtitle": "Understand English PDF documents faster with AI-powered tools. Upload, chat, and learn - no signup needed.",
+    "startUploading": "Start Uploading",
+    "createAccount": "Create Free Account",
+    "featureUploadTitle": "Upload PDFs",
+    "featureUploadDesc": "Upload your documents and let AI extract and process the content automatically.",
+    "featureChatTitle": "Chat with AI",
+    "featureChatDesc": "Ask questions about your documents and get instant, accurate answers.",
+    "featureAITitle": "AI Actions",
+    "featureAIDesc": "Generate summaries and explanations instantly with AI assistance.",
+    "premiumTitle": "Unlock Premium Features",
+    "premiumSubtitle": "Register for free to access flashcards, quizzes, and save your documents permanently.",
+    "featureFlashcardsTitle": "Automatic Flashcards",
+    "featureFlashcardsDesc": "AI automatically creates flashcards from document content for effective review.",
+    "featureQuizzesTitle": "Interactive Quizzes",
+    "featureQuizzesDesc": "Create quizzes automatically and track your learning progress.",
+    "unlockPremium": "Unlock Premium Features",
+    "whyChooseTitle": "Why Choose Awesome PDF?",
+    "whyChooseSubtitle": "Powerful AI learning tool, easy to use and completely free",
+    "reason1Title": "Fast",
+    "reason1Desc": "Process documents and create learning content in seconds.",
+    "reason2Title": "Accurate",
+    "reason2Desc": "AI trained to provide accurate and reliable information.",
+    "reason3Title": "Intelligent",
+    "reason3Desc": "Learn and adapt to your learning style."
   }
 }
