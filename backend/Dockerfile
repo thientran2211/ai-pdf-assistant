@@ -1,23 +1,18 @@
-# Sử dụng Node.js 18 Alpine
-FROM node:18-alpine
+FROM node:20-alpine
 
-# Set working directory trong container
 WORKDIR /app
 
-# Copy package files trước để tận dụng Docker cache
 COPY package*.json ./
 
-# Install dependencies
+# Install production dependencies
 RUN npm ci --only=production
 
-# Copy toàn bộ source code
+# Remove test files from pdf-parse to prevent ENOENT error
+RUN rm -rf node_modules/pdf-parse/test || true
+
+# Copy source code
 COPY . .
 
-# Remove test files to avoid runtime errors
-RUN find node_modules -name "test" -type d -exec rm -rf {} + 2>/dev/null || true
-
-# Expose port 8000
 EXPOSE 8000
 
-# Start server
 CMD ["node", "server.js"]

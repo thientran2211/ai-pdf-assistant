@@ -4,5 +4,7 @@ npm-debug.log
 .git
 .gitignore
 README.md
-.DS_Store
-uploads
+test/
+tests/
+*.test.js
+*.spec.js
