@@ -7,6 +7,8 @@ import ForgotPasswordPage from './pages/Auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/Auth/ResetPasswordPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminRoute from './components/admin/AdminRoute';
+import AdminPage from './pages/Auth/AdminPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
 import DocumentListPage from './pages/Documents/DocumentListPage';
 import DocumentDetailPage from './pages/Documents/DocumentDetailPage';
@@ -50,6 +52,7 @@ const App = () => {
           <Route path="quizzes/:quizId" element={<QuizTakePage />} />
           <Route path="/quizzes/:quizId/results" element={<QuizResultPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

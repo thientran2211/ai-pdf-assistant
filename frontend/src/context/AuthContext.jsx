@@ -18,6 +18,8 @@ export const AuthProvider = ({ children }) => {
   const [isGuest, setIsGuest] = useState(true);
   const [guestSessionId, setGuestSessionId] = useState(null);
 
+  const isAdmin = user?.role === 'admin';
+
   useEffect(() => {
     let sessionId = localStorage.getItem('guestSessionId');
 
@@ -118,6 +120,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     isGuest,
     guestSessionId,
+    isAdmin,
     login,
     logout,
     updateUser,

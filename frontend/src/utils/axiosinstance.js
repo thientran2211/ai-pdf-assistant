@@ -20,7 +20,7 @@ const isValidUUID = (str) => {
 axiosInstance.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("token") || sessionStorage.getItem('token');
-    const guestSessionId = localStorage.getItem('guestSessionId');
+    let guestSessionId = localStorage.getItem('guestSessionId');
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;

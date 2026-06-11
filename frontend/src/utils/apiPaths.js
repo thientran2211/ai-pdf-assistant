@@ -11,6 +11,13 @@ export const API_PATHS = {
     RESET_PASSWORD: "/api/auth/reset-password",
   },
 
+  ADMIN: {
+    USERS: "/api/admin/users",
+    UPDATE_USER: (id) => `/api/admin/users/${id}`,
+    RESET_QUOTA: (id) => `/api/admin/users/${id}/reset-quota`,
+    STATS: "/api/admin/stats",
+  },
+
   DOCUMENTS: {
     UPLOAD: "/api/documents/upload",
     GET_DOCUMENTS: "/api/documents",
