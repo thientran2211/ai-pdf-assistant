@@ -1,4 +1,8 @@
-export const BASE_URL = "http://localhost:8000";
+const isDevelopment = import.meta.env.DEV;
+
+export const BASE_URL = isDevelopment 
+  ? "http://localhost:8000"  // Development
+  : "https://ai-pdf-assistant-xmnf.onrender.com";
 
 export const API_PATHS = {
   AUTH: {
