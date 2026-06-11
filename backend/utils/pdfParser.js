@@ -8,10 +8,11 @@ import pdfParse from 'pdf-parse';
  */
 export const extractTextFromPDF = async (filePath) => {
   try {
+    // Đọc file PDF thành Buffer
     const dataBuffer = await fs.readFile(filePath);
-    // pdf-parse expects a Uint8Array, not a buffer
-    const parser = new PDFParse(new Uint8Array(dataBuffer));
-    const data = await pdfParse(pdfBuffer);
+    
+    // Parse PDF - pdf-parse chấp nhận Buffer trực tiếp
+    const data = await pdfParse(dataBuffer);
 
     return {
       text: data.text,
