@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import { PDFParse } from 'pdf-parse';
+import pdfParse from 'pdf-parse';
 
 /**
  * Extract text from PDF file
@@ -11,7 +11,7 @@ export const extractTextFromPDF = async (filePath) => {
     const dataBuffer = await fs.readFile(filePath);
     // pdf-parse expects a Uint8Array, not a buffer
     const parser = new PDFParse(new Uint8Array(dataBuffer));
-    const data = await parser.getText();
+    const data = await pdfParse(pdfBuffer);
 
     return {
       text: data.text,
