@@ -13,6 +13,9 @@ RUN npm ci --only=production
 # Copy toàn bộ source code
 COPY . .
 
+# Remove test files to avoid runtime errors
+RUN find node_modules -name "test" -type d -exec rm -rf {} + 2>/dev/null || true
+
 # Expose port 8000
 EXPOSE 8000
 
