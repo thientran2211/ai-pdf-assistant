@@ -22,7 +22,10 @@ const RegisterPage = () => {
   const handleEmailChange = (e) => {
     const value = e.target.value;
     setEmail(value);
-    setEmailError(getEmailError(value));
+    
+    const errorCode = getEmailError(value);
+    const errorMessage = errorCode ? t(`validation.${errorCode}`) : null;
+    setEmailError(errorMessage);
   };
 
   const handleSubmit = async (e) => {
@@ -30,8 +33,12 @@ const RegisterPage = () => {
 
     if (loading) return;
 
-    if (!email.trim() || emailError) {
-      setEmailError(emailError || 'Email is required');
+    if (!email.trim()) {
+      setEmailError(t('validation.emailRequired'));
+      return;
+    }
+
+    if (emailError) {
       return;
     }
 
@@ -161,7 +168,6 @@ const RegisterPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   onFocus={() => setFocusedField("password")}
                   onBlur={() => setFocusedField(null)}
-                  // 🔧 FIX: Thay pr-4 bằng pr-12 để tránh text bị đè bởi icon mắt
                   className="w-full h-12 pl-12 pr-12 border-2 border-slate-200 rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:shadow-lg focus:shadow-emerald-500/10"
                   placeholder={t('auth.placeholderPassword')}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !loading) handleSubmit(e); }}

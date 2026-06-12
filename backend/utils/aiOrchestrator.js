@@ -32,10 +32,9 @@ export const TASK_CONFIG = {
         reason: 'Flashcards cần hiểu sâu ngữ nghĩa tài liệu'
     },
     quiz: {
-        primary: AI_MODELS.GROQ,
-        fallback: AI_MODELS.GEMINI,
-        // reason: 'Quiz cần chất lượng câu hỏi chính xác cao'
-        reason: 'Groq ổn định hơn cho quiz generation'
+        primary: AI_MODELS.GEMINI,
+        fallback: AI_MODELS.GROQ,
+        reason: 'Quiz cần chất lượng câu hỏi chính xác cao'
     }
 };
 

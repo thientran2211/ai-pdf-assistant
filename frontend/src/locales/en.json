@@ -49,7 +49,6 @@
     "btnSummarize": "Summarize",
     "explain": "Explain a concept",
     "descExplanation": "Enter a topic or concept from the document to get a detailed explanation.",
-    "inputExplain": "e.g., Example",
     "btnExplain": "Explain",
     "flashcards": "Generate Flashcards",
     "quiz": "Generate Quiz",
@@ -370,5 +369,12 @@
     "reason2Desc": "AI trained to provide accurate and reliable information.",
     "reason3Title": "Intelligent",
     "reason3Desc": "Learn and adapt to your learning style."
+  },
+  "validation": {
+    "invalid_format": "Invalid email format",
+    "emailRequired": "Email is required",
+    "email_too_long": "Email is too long",
+    "password_too_short": "Password must be at least 6 characters",
+    "username_too_short": "Username must be at least 3 characters"
   }
 }

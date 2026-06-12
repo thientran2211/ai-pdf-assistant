@@ -48,7 +48,6 @@
     "btnSummarize": "Tóm tắt",
     "explain": "Giải thích khái niệm",
     "descExplanation": "Nhập một chủ đề hoặc khái niệm từ tài liệu để giải thích chi tiết.",
-    "inputExplain": "Ví dụ: Machine Learning là gì?",
     "btnExplain": "Giải thích",
     "flashcards": "Tạo Flashcards",
     "quiz": "Tạo bài Quiz",
@@ -299,7 +298,7 @@
     "sending": "Đang gửi...",
     "updating": "Đang cập nhật...",
     "emailError": "Email không đúng định dạng",
-    "emailInvalid": "Email không đúng định dạng. Ví dụ: user@example.com",
+    "emailInvalid": "Email chưa đúng định dạng",
     "emailRequired": "Email là bắt buộc",
     "successLogin": "Đăng nhập thành công!",
     "errorLogin": "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.",
@@ -405,5 +404,12 @@
     "benefit7": "Hỗ trợ ưu tiên và cập nhật tính năng mới",
     "registerNow": "Đăng ký miễn phí",
     "maybeLater": "Có lẽ để sau"
+  },
+  "validation": {
+    "invalid_format": "Email chưa đúng định dạng",
+    "emailRequired": "Vui lòng nhập email",
+    "email_too_long": "Email quá dài",
+    "password_too_short": "Mật khẩu phải có ít nhất 6 ký tự",
+    "username_too_short": "Tên đăng nhập phải có ít nhất 3 ký tự"
   }
 }
