@@ -194,11 +194,14 @@ export const chat = async (req, res, next) => {
     const relevantChunks = findRelevantChunks(document.chunks, question, 3);
     const chunkIndices = relevantChunks.map(c => c.chunkIndex);
 
+    let chatHistory = null;
+
     if (userId) {
-      let chatHistory = await ChatHistory.findOne({
+      chatHistory = await ChatHistory.findOne({
         userId: userId,
         documentId: document._id
       });
+      
       if (!chatHistory) {
         chatHistory = await ChatHistory.create({
           userId: userId,
@@ -228,7 +231,7 @@ export const chat = async (req, res, next) => {
         question,
         answer,
         relevantChunks: chunkIndices,
-        chatHistoryId: userId ? chatHistory?._id : null,
+        chatHistoryId: chatHistory ? chatHistory._id : null,
         isGuest: !userId
       },
       message: 'Response generated successfully'
