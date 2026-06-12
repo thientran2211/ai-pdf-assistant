@@ -5,7 +5,12 @@ import { extractTextFromPDF } from '../utils/pdfParser.js';
 import { optionalAuth } from '../middleware/optionalAuth.js';
 import { chunkText } from '../utils/textChunker.js';
 import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // @desc    Upload PDF document
 // @route   POST /api/documents/upload
@@ -13,7 +18,6 @@ import mongoose from 'mongoose';
 export const uploadDocument = async (req, res, next) => {
   try {
     const userId = req.user?._id || null;
-
     const guestSessionId = !req.user ? req.headers['x-guest-session'] : null;
 
     if (!userId && !guestSessionId) {
@@ -34,7 +38,6 @@ export const uploadDocument = async (req, res, next) => {
     const { title } = req.body;
 
     if (!title) {
-      // Delete the uploaded file if no title provided
       await fs.unlink(req.file.path);
       return res.status(400).json({
         success: false,
@@ -42,9 +45,8 @@ export const uploadDocument = async (req, res, next) => {
         statusCode: 400
       });
     }
-    // Construct the URL for the uploaded file
-    const baseUrl = `http://localhost:${process.env.PORT || 8000}`;
-    const fileUrl = `${baseUrl}/uploads/documents/${req.file.filename}`;
+
+    const fileUrl = `/uploads/documents/${req.file.filename}`;
 
     // Create document record
     const document = await Document.create({
@@ -52,12 +54,12 @@ export const uploadDocument = async (req, res, next) => {
       guestSessionId,
       title,
       fileName: req.file.originalname,
-      filePath: fileUrl, // store the URL instead of the local path
+      filePath: fileUrl,
       fileSize: req.file.size,
       status: 'processing'
     });
 
-    // Process PDF in background (in production, use a queue like Bull)
+    // Process PDF in background
     processPDF(document._id, req.file.path).catch(err => {
       console.error('PDF processing error:', err);
     });
@@ -68,7 +70,6 @@ export const uploadDocument = async (req, res, next) => {
       message: 'Document uploaded successfully. Processing in progress...'
     });
   } catch (error) {
-    // Clean up file on error
     if (req.file) {
       await fs.unlink(req.file.path).catch(() => { });
     }
@@ -80,11 +81,8 @@ export const uploadDocument = async (req, res, next) => {
 const processPDF = async (documentId, filePath) => {
   try {
     const { text } = await extractTextFromPDF(filePath);
-
-    // Create chunks
     const chunks = chunkText(text, 500, 50);
 
-    // Update document
     await Document.findByIdAndUpdate(documentId, {
       extractedText: text,
       chunks: chunks,
@@ -94,7 +92,6 @@ const processPDF = async (documentId, filePath) => {
     console.log(`Document ${documentId} processed successfully`);
   } catch (error) {
     console.error(`Error processing document ${documentId}:`, error);
-
     await Document.findByIdAndUpdate(documentId, {
       status: 'failed'
     });
@@ -187,8 +184,7 @@ export const getDocuments = async (req, res, next) => {
 export const getDocument = async (req, res, next) => {
   try {
     const { id } = req.params;
-
-    const query = { _id: id};
+    const query = { _id: id };
 
     if (!req.user) {
       const guestSessionId = req.headers['x-guest-session'];
@@ -229,15 +225,9 @@ export const getDocument = async (req, res, next) => {
       });
     }
 
-    // Get counts of associated flashcards and quizzes
-    // const flashcardCount = await Flashcard.countDocuments({ documentId: document._id, userId: req.user._id });
-    // const quizCount = await Quiz.countDocuments({ documentId: document._id, userId: req.user._id });
-
-    // Update last accessed
     document.lastAccessed = Date.now();
     await document.save();
 
-    // Combine document data with counts
     const documentData = document.toObject();
     documentData.flashcardCount = flashcardCount;
     documentData.quizCount = quizCount;
@@ -268,10 +258,18 @@ export const deleteDocument = async (req, res, next) => {
         statusCode: 404
       });
     }
-    // Delete file from filesystem
-    await fs.unlink(document.filePath).catch(() => { });
 
-    // Delete document
+    let absolutePath;
+    if (document.filePath.startsWith('/')) {
+      absolutePath = path.join(__dirname, '..', document.filePath);
+    } else {
+      absolutePath = document.filePath;
+    }
+
+    await fs.unlink(absolutePath).catch((err) => {
+      console.log('File not found or already deleted:', err.message);
+    });
+
     await document.deleteOne();
 
     res.status(200).json({
