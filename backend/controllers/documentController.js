@@ -80,16 +80,15 @@ export const uploadDocument = async (req, res, next) => {
 // Helper function to process PDF
 const processPDF = async (documentId, filePath) => {
   try {
-    const { text } = await extractTextFromPDF(filePath);
+    const { text, numPages } = await extractTextFromPDF(filePath);
     const chunks = chunkText(text, 500, 50);
 
     await Document.findByIdAndUpdate(documentId, {
       extractedText: text,
       chunks: chunks,
+      numPages: numPages || 0,
       status: 'ready'
-    });
-
-    console.log(`Document ${documentId} processed successfully`);
+    });    
   } catch (error) {
     console.error(`Error processing document ${documentId}:`, error);
     await Document.findByIdAndUpdate(documentId, {
@@ -243,40 +242,78 @@ export const getDocument = async (req, res, next) => {
 
 // @desc    Delete document
 // @route   DELETE /api/documents/:id
-// @access  Private
+// @access  Optional Auth (User or Guest)
 export const deleteDocument = async (req, res, next) => {
   try {
-    const document = await Document.findOne({
-      _id: req.params.id,
-      userId: req.user._id
-    });
+    const userId = req.user?._id;
+    const guestSessionId = req.headers['x-guest-session'];
+    
+    // Build query based on auth type
+    let query = { _id: req.params.id };
+    
+    if (userId) {
+      query.userId = userId;
+    } else if (guestSessionId) {
+      query.guestSessionId = guestSessionId;
+      query.userId = null;
+    } else {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required. Please login or provide guest session.',
+        statusCode: 401
+      });
+    }
+
+    // Find document
+    const document = await Document.findOne(query);
 
     if (!document) {
       return res.status(404).json({
         success: false,
-        error: 'Document not found',
+        error: 'Document not found or you do not have permission to delete',
         statusCode: 404
       });
     }
 
-    let absolutePath;
-    if (document.filePath.startsWith('/')) {
-      absolutePath = path.join(__dirname, '..', document.filePath);
-    } else {
-      absolutePath = document.filePath;
+    // Delete file from filesystem
+    try {
+      let filePathToCheck = document.filePath;
+
+      // Handle old format: full URL
+      if (filePathToCheck.startsWith('http://') || filePathToCheck.startsWith('https://')) {
+        try {
+          const url = new URL(filePathToCheck);
+          filePathToCheck = url.pathname;
+        } catch (urlError) {
+          next(urlError);
+        }
+      }
+
+      const relativePath = filePathToCheck.startsWith('/')
+        ? filePathToCheck.substring(1)
+        : filePathToCheck;
+
+      const absolutePath = path.join(__dirname, '..', relativePath);
+
+      try {
+        await fs.access(absolutePath);
+        await fs.unlink(absolutePath);
+      } catch (accessError) {
+        next(accessError);
+      }
+    } catch (fileError) {
+      next(fileError);
     }
 
-    await fs.unlink(absolutePath).catch((err) => {
-      console.log('File not found or already deleted:', err.message);
-    });
-
-    await document.deleteOne();
+    // Delete document from database
+    await Document.findByIdAndDelete(document._id);
 
     res.status(200).json({
       success: true,
       message: 'Document deleted successfully'
     });
   } catch (error) {
+    console.error('DELETE DOCUMENT ERROR:', error);
     next(error);
   }
 };

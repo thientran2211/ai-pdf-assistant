@@ -141,7 +141,7 @@ const DocumentDetailPage = () => {
           <div className="bg-white border border-slate-200 rounded-xl p-4">
             <p className="text-xs text-slate-500 mb-1">Pages</p>
             <p className="text-sm font-semibold text-slate-900">
-              {document.chunks?.length || 0}
+              {document.numPages || document.chunks?.length || 0}
             </p>
           </div>
         </div>
@@ -159,7 +159,7 @@ const DocumentDetailPage = () => {
     );
   };
 
-  const renderChat = () => <ChatInterface documentId={id} isGuest={isGuest} />;
+  const renderChat = () => <ChatInterface key={`chat-${id}`} documentId={id} isGuest={isGuest} />;
   const renderAIActions = () => <AIActions documentId={id} isGuest={isGuest} />;
 
   const renderFlashcardsTab = () => {

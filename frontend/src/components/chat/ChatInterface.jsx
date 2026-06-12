@@ -44,7 +44,7 @@ const ChatInterface = ({ documentId, isGuest = false }) => {
     };
 
     fetchChatHistory();
-  }, [documentId, isGuest, t]);
+  }, [documentId, isGuest]);
 
   useEffect(() => {
     scrollToBottom();

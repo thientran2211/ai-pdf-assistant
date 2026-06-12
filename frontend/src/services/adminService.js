@@ -42,11 +42,21 @@ export const getStats = async () => {
   }
 };
 
+const deleteUser = async (userId) => {
+  try {
+    const response = await axiosInstance.delete(`${API_PATHS.ADMIN.UPDATE_USER(userId)}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to delete user' };
+  }
+};
+
 const adminService = {
   getUsers,
   updateUser,
   resetUserQuota,
-  getStats
+  getStats,
+  deleteUser
 };
 
 export default adminService;

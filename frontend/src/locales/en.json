@@ -293,31 +293,38 @@
     "footerPolicy": "By continuing, you agree to our Term & Privacy Policy"
   },
   "admin": {
-    "title": "🛡️ Admin Dashboard",
-    "subtitle": "Manage users, API quotas, and system settings",
+    "title": "System Administration",
+    "subtitle": "Manage users, documents, and system statistics",
     "backToDashboard": "Back to Dashboard",
-    "totalUsers": "Total Users",
-    "totalDocuments": "Total Documents",
-    "activeUsers": "Active (7 days)",
     "userManagement": "User Management",
     "searchUsers": "Search users...",
-    "user": "User",
-    "role": "Role",
-    "status": "Status",
-    "apiQuota": "API Quota",
-    "joined": "Joined",
-    "actions": "Actions",
+    
+    "deleteConfirmTitle": "ARE YOU SURE?",
+    "deleteConfirmMessage": "You are about to permanently delete user \"{{username}}\".",
+    "deleteConfirmWarning": "This will also delete:",
+    "deleteConfirmDocs": "• All documents",
+    "deleteConfirmFlashcards": "• All flashcards",
+    "deleteConfirmQuizzes": "• All quizzes",
+    "deleteConfirmChats": "• All chat histories",
+    "deleteConfirmIrreversible": "This action CANNOT be undone!",
+    
+    "deleteSuccess": "User \"{{username}}\" deleted permanently",
+    "deleteError": "Failed to delete user",
+    "deleteSelfError": "Cannot delete yourself",
+    "deleteAdminError": "Cannot delete admin users. Remove admin role first.",
+    
+    "updateSuccess": "User updated successfully",
+    "updateError": "Failed to update user",
+    
+    "resetQuotaConfirm": "Reset API quota for this user?",
+    "resetQuotaSuccess": "Quota reset successfully",
+    "resetQuotaError": "Failed to reset quota",
+    
     "blockUser": "Block user",
     "unblockUser": "Unblock user",
-    "resetQuota": "Reset API quota",
     "makeAdmin": "Make admin",
     "removeAdmin": "Remove admin",
-    "noUsersFound": "No users found",
-    "noUsersMatch": "No users match your search",
-    "admin": "Admin",
-    "userRole": "User",
-    "active": "Active",
-    "blocked": "Blocked"
+    "cannotDeleteAdmin": "Cannot delete admin user"
   },
   "profile": {
     "title": "Profile Settings",

@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { 
   Users, Shield, RefreshCw, BarChart3, Lock, Unlock, 
-  ArrowLeft, UserCheck, UserX, Crown, Activity 
+  ArrowLeft, UserCheck, UserX, Crown, Activity, Trash2
 } from 'lucide-react';
 import adminService from '../../services/adminService';
 import Spinner from '../../components/common/Spinner';
 import toast from 'react-hot-toast';
 import PageHeader from '../../components/common/PageHeader';
+import ConfirmDeleteModal from '../../components/common/ConfirmDeleteModal';
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -18,6 +19,11 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    userId: null,
+    username: ''
+  });
 
   useEffect(() => {
     fetchData();
@@ -44,23 +50,44 @@ const AdminPage = () => {
     setUpdatingId(userId);
     try {
       await adminService.updateUser(userId, updates);
-      toast.success('User updated successfully');
+      toast.success(t('admin.updateSuccess'));
       fetchData();
     } catch (error) {
-      toast.error(error.message || 'Failed to update user');
+      toast.error(error.message || t('admin.updateError'));
     } finally {
       setUpdatingId(null);
     }
   };
 
-  const handleResetQuota = async (userId) => {
-    if (!window.confirm('Reset API quota for this user?')) return;
+  const handleDeleteUser = (userId, username) => {
+    setDeleteModal({ isOpen: true, userId, username });
+  };
+
+  const handleDeleteConfirm = async () => {
+    const { userId, username } = deleteModal;
+    
+    setUpdatingId(userId);
     try {
-      await adminService.resetUserQuota(userId);
-      toast.success('Quota reset successfully');
+      await adminService.deleteUser(userId);
+      toast.success(t('admin.deleteSuccess', { username }));
       fetchData();
     } catch (error) {
-      toast.error('Failed to reset quota');
+      console.error('Delete user error:', error);
+      toast.error(error.error || error.message || t('admin.deleteError'));
+    } finally {
+      setDeleteModal({ isOpen: false, userId: null, username: '' });
+      setUpdatingId(null);
+    }
+  };
+
+  const handleResetQuota = async (userId) => {
+    if (!window.confirm(t('admin.resetQuotaConfirm'))) return;
+    try {
+      await adminService.resetUserQuota(userId);
+      toast.success(t('admin.resetQuotaSuccess'));
+      fetchData();
+    } catch (error) {
+      toast.error(t('admin.resetQuotaError'));
     }
   };
 
@@ -136,7 +163,7 @@ const AdminPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-lg transition-shadow">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-linear-to-br from-blue-400 to-cyan-500 shadow-lg shadow-blue-500/25 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-500 shadow-lg shadow-blue-500/25 flex items-center justify-center">
                   <Users className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -148,7 +175,7 @@ const AdminPage = () => {
             
             <div className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-lg transition-shadow">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-linear-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/25 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/25 flex items-center justify-center">
                   <BarChart3 className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -160,7 +187,7 @@ const AdminPage = () => {
             
             <div className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-lg transition-shadow">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-linear-to-br from-purple-400 to-pink-500 shadow-lg shadow-purple-500/25 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 to-pink-500 shadow-lg shadow-purple-500/25 flex items-center justify-center">
                   <Activity className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -214,7 +241,7 @@ const AdminPage = () => {
                   <tr key={user._id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-linear-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-semibold text-sm">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-semibold text-sm">
                           {user.username?.charAt(0).toUpperCase() || 'U'}
                         </div>
                         <div>
@@ -260,7 +287,7 @@ const AdminPage = () => {
                               ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' 
                               : 'bg-rose-100 text-rose-600 hover:bg-rose-200'
                           }`}
-                          title={user.isBlocked ? 'Unblock user' : 'Block user'}
+                          title={user.isBlocked ? t('admin.unblockUser') : t('admin.blockUser')}
                         >
                           {user.isBlocked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                         </button>
@@ -282,9 +309,19 @@ const AdminPage = () => {
                           })}
                           disabled={updatingId === user._id}
                           className="p-2 rounded-lg bg-purple-100 text-purple-600 hover:bg-purple-200 transition-all disabled:opacity-50"
-                          title={user.role === 'admin' ? 'Remove admin' : 'Make admin'}
+                          title={user.role === 'admin' ? t('admin.removeAdmin') : t('admin.makeAdmin')}
                         >
                           <Shield className="w-4 h-4" />
+                        </button>
+
+                        {/* DELETE BUTTON */}
+                        <button
+                          onClick={() => handleDeleteUser(user._id, user.username)}
+                          disabled={updatingId === user._id || user.role === 'admin'}
+                          className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          title={user.role === 'admin' ? t('admin.cannotDeleteAdmin') : 'Delete user permanently'}
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -305,6 +342,15 @@ const AdminPage = () => {
         </div>
         
       </div>
+
+      {/* Confirm Delete Modal */}
+      <ConfirmDeleteModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, userId: null, username: '' })}
+        onConfirm={handleDeleteConfirm}
+        username={deleteModal.username}
+        loading={updatingId === deleteModal.userId}
+      />
     </div>
   );
 };

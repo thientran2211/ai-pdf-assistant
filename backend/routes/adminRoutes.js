@@ -5,7 +5,8 @@ import {
   getUsers,
   updateUser,
   resetUserQuota,
-  getStats
+  getStats,
+  deleteUser
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -15,6 +16,7 @@ router.use(adminOnly);
 
 router.get('/users', getUsers);
 router.put('/users/:id', updateUser);
+router.delete('/users/:id', deleteUser);
 router.post('/users/:id/reset-quota', resetUserQuota);
 router.get('/stats', getStats);
 

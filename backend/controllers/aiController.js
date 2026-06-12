@@ -137,7 +137,6 @@ export const generateSummary = async (req, res, next) => {
       'summary',
       'generateSummary',
       document.extractedText,
-      null,
       language
     );
 

@@ -102,7 +102,7 @@ export const executeWithFallback = async (taskType, functionName, ...args) => {
 
         // Only fallback if it's a retryable error
         if (isRetryableError(primaryError)) {
-            console.log(`[Orchestrator] ⚡ Falling back to ${config.fallback.toUpperCase()}...`);
+            console.log(`[Orchestrator] Falling back to ${config.fallback.toUpperCase()}...`);
             try {
                 const result = await fallbackService[functionName](...args);
                 console.log(`[Orchestrator] Fallback to ${config.fallback.toUpperCase()} succeeded for ${taskType}`);

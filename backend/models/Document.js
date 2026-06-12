@@ -39,6 +39,10 @@ const documentSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  numPages: {
+    type: Number,
+    default: 0
+  },
   chunks: [{
     content: {
       type: String,
