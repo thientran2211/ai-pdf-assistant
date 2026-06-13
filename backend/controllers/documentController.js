@@ -1,6 +1,7 @@
 import Document from '../models/Document.js';
 import Flashcard from '../models/Flashcard.js';
 import Quiz from '../models/Quiz.js';
+import ChatHistory from '../models/ChatHistory.js';
 import { extractTextFromPDF } from '../utils/pdfParser.js';
 import { optionalAuth } from '../middleware/optionalAuth.js';
 import { chunkText } from '../utils/textChunker.js';
@@ -242,13 +243,12 @@ export const getDocument = async (req, res, next) => {
 
 // @desc    Delete document
 // @route   DELETE /api/documents/:id
-// @access  Optional Auth (User or Guest)
+// @access  Optional Auth
 export const deleteDocument = async (req, res, next) => {
   try {
     const userId = req.user?._id;
     const guestSessionId = req.headers['x-guest-session'];
     
-    // Build query based on auth type
     let query = { _id: req.params.id };
     
     if (userId) {
@@ -275,17 +275,23 @@ export const deleteDocument = async (req, res, next) => {
       });
     }
 
+    // Cascade delete: Remove all related data
+    const [deletedFlashcards, deletedQuizzes, deletedChatHistories] = await Promise.all([
+      Flashcard.deleteMany({ documentId: document._id }),
+      Quiz.deleteMany({ documentId: document._id }),
+      ChatHistory.deleteMany({ documentId: document._id })
+    ]);
+
     // Delete file from filesystem
     try {
       let filePathToCheck = document.filePath;
 
-      // Handle old format: full URL
       if (filePathToCheck.startsWith('http://') || filePathToCheck.startsWith('https://')) {
         try {
           const url = new URL(filePathToCheck);
           filePathToCheck = url.pathname;
         } catch (urlError) {
-          next(urlError);
+          // Invalid URL format, use as-is
         }
       }
 
@@ -295,14 +301,19 @@ export const deleteDocument = async (req, res, next) => {
 
       const absolutePath = path.join(__dirname, '..', relativePath);
 
+      // Check if file exists before deleting
       try {
         await fs.access(absolutePath);
         await fs.unlink(absolutePath);
       } catch (accessError) {
-        next(accessError);
+        // File not found or access error, continue with database deletion
+        if (accessError.code !== 'ENOENT') {
+          console.warn('File access error:', accessError.message);
+        }
       }
     } catch (fileError) {
-      next(fileError);
+      // File deletion error, continue with database deletion
+      console.warn('File deletion error:', fileError.message);
     }
 
     // Delete document from database
@@ -310,10 +321,17 @@ export const deleteDocument = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: 'Document deleted successfully'
+      message: 'Document and all related data deleted successfully',
+      data: {
+        deletedFlashcards: deletedFlashcards.deletedCount,
+        deletedQuizzes: deletedQuizzes.deletedCount,
+        deletedChatHistories: deletedChatHistories.deletedCount
+      }
     });
   } catch (error) {
-    console.error('DELETE DOCUMENT ERROR:', error);
-    next(error);
+    console.error('Delete document error:', error);
+    if (!res.headersSent) {
+      next(error);
+    }
   }
 };

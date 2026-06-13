@@ -22,29 +22,39 @@ const ChatInterface = ({ documentId, isGuest = false }) => {
   };
 
   useEffect(() => {
-    if (isGuest) {
-      setInitialLoading(false);
-      return;
-    }
+  if (isGuest) {
+    setInitialLoading(false);
+    return;
+  }
 
-    const fetchChatHistory = async () => {
-      try {
-        setInitialLoading(true);
-        const response = await aiService.getChatHistory(documentId);
-        const messages = response?.data?.messages || response?.data || [];
-        setHistory(messages);
-      } catch (error) {
-        console.error('Failed to fetch chat history:', error);
-        if (!isGuest) {
-          toast.error(t('chat.historyError') || 'Failed to load chat history');
-        }
-      } finally {
-        setInitialLoading(false);
+  const fetchChatHistory = async () => {
+    try {
+      setInitialLoading(true);
+      const response = await aiService.getChatHistory(documentId);
+           
+      const messages = 
+        response?.data?.messages || 
+        response?.messages ||  
+        response?.data ||     
+        (Array.isArray(response) ? response : []);
+      
+      const validMessages = messages.filter(
+        msg => msg && msg.content && msg.content !== '...'
+      );
+      
+      setHistory(validMessages);
+    } catch (error) {
+      console.error('[CHAT] Failed to fetch history:', error);
+      if (!isGuest) {
+        toast.error(t('chat.historyError') || 'Failed to load chat history');
       }
-    };
+    } finally {
+      setInitialLoading(false);
+    }
+  };
 
-    fetchChatHistory();
-  }, [documentId, isGuest]);
+  fetchChatHistory();
+}, [documentId, isGuest]);
 
   useEffect(() => {
     scrollToBottom();

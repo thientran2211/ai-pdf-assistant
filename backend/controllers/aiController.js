@@ -161,7 +161,11 @@ export const chat = async (req, res, next) => {
     const { documentId, question, language = 'en' } = req.body;
 
     if (!documentId || !question) {
-      return res.status(400).json({ success: false, error: 'Please provide documentId and question', statusCode: 400 });
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Please provide documentId and question', 
+        statusCode: 400 
+      });
     }
 
     const userId = req.user?._id;
@@ -193,6 +197,14 @@ export const chat = async (req, res, next) => {
     const relevantChunks = findRelevantChunks(document.chunks, question, 3);
     const chunkIndices = relevantChunks.map(c => c.chunkIndex);
 
+    const answer = await executeWithFallback(
+      'chat',
+      'chatWithContext',
+      question,
+      relevantChunks,
+      language
+    );
+
     let chatHistory = null;
 
     if (userId) {
@@ -210,19 +222,22 @@ export const chat = async (req, res, next) => {
       }
 
       chatHistory.messages.push(
-        { role: 'user', content: question, timestamp: new Date(), relevantChunks: [] },
-        { role: 'assistant', content: '...', timestamp: new Date(), relevantChunks: chunkIndices }
+        { 
+          role: 'user', 
+          content: question, 
+          timestamp: new Date(), 
+          relevantChunks: [] 
+        },
+        { 
+          role: 'assistant', 
+          content: answer,
+          timestamp: new Date(), 
+          relevantChunks: chunkIndices 
+        }
       );
       await chatHistory.save();
+      
     }
-
-    const answer = await executeWithFallback(
-      'chat',
-      'chatWithContext',
-      question,
-      relevantChunks,
-      language
-    );
 
     res.status(200).json({
       success: true,
@@ -236,7 +251,7 @@ export const chat = async (req, res, next) => {
       message: 'Response generated successfully'
     });
   } catch (error) {
-    console.error('Chat error:', error);
+    console.error('[CHAT] Error:', error);
     next(error);
   }
 };
@@ -319,22 +334,31 @@ export const getChatHistory = async (req, res, next) => {
     const chatHistory = await ChatHistory.findOne({
       userId: req.user._id,
       documentId: documentId
-    }).select('messages');
+    });
 
     if (!chatHistory) {
       return res.status(200).json({
         success: true,
-        data: [],  // return an empty array if no chat history found
-        message: 'No chat history found for this document'
+        data: {
+          messages: []
+        },
+        message: 'No chat history found'
       });
     }
 
+    const validMessages = chatHistory.messages.filter(
+      msg => msg.content && msg.content !== '...'
+    );
+
     res.status(200).json({
       success: true,
-      data: chatHistory.messages,
+      data: {
+        messages: validMessages
+      },
       message: 'Chat history retrieved successfully'
     });
   } catch (error) {
-    next(error)
+    console.error('[HISTORY] Error:', error);
+    next(error);
   }
 };
